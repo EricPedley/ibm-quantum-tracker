@@ -1,0 +1,14 @@
+# created by virtualenv automatically
+share
+src
+cmake
+contrib
+Lib
+qiskit
+Scripts
+share
+Scripts
+CMakeLists.txt
+token.txt
+MANIFEST.in
+node_modules
