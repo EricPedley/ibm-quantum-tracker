@@ -1,5 +1,5 @@
 
-async function loadGraph(name) {
+async function loadGraph(name,timeSpan) {
     document.querySelector("#graph").innerHTML = ""
     const loadEl = document.querySelector('#load');
     // set the dimensions and margins of the graph
@@ -15,28 +15,34 @@ async function loadGraph(name) {
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
     //Read the data
-    const month = "2020-12"
-    const day = "19"
-    const today = dbobject[name][month][day]
     const data = [];
     var max = 0;
     var min = -1
-    for (hour of Object.keys(today)) {
-        const jobs = today[hour]
-        const d = {
-            date: `${month}-${day}-${hour}`,
-            value: `${jobs}`
+    if(timeSpan=="1D") {
+        const todayDate = new Date()
+        const month = `${todayDate.getFullYear()}-${todayDate.getMonth()+1}`
+        const day = todayDate.getDate()
+        console.log(month,day)
+        const today = dbobject[name][month][day]
+        for (hour of Object.keys(today)) {
+            const jobs = today[hour]
+            const d = {
+                date: `${month}-${day}-${hour}`,
+                value: `${jobs}`
+            }
+            if (jobs > max)
+                max = jobs
+            if (min == -1 || jobs < min)
+                min = jobs
+            data.push({ date: d3.timeParse("%Y-%m-%d-%H")(d.date), value: d.value })
         }
-        if (jobs > max)
-            max = jobs
-        if (min == -1 || jobs < min)
-            min = jobs
-        data.push({ date: d3.timeParse("%Y-%m-%d-%H")(d.date), value: d.value })
-
     }
+
+
     data.sort((a, b) => {
         return Date.parse(a.date) - Date.parse(b.date)
     })
+    console.log(data)
     // Add X axis --> it is a date format
     var x = d3.scaleTime()
         .domain(d3.extent(data, function (d) { return d.date; }))
