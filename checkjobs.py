@@ -1,5 +1,7 @@
 from qiskit import IBMQ
 import os
+import requests as req
+from datetime import datetime
 
 ibm_token = ""
 
@@ -14,11 +16,19 @@ if ibm_token=="":
         raise RuntimeError("You didn't set the token in the IBM_TOKEN environment variable or token.txt file")
     
 
-
-IBMQ.save_account(ibm_token)
-
+if not IBMQ.stored_account():
+    IBMQ.save_account(ibm_token)
 IBMQ.load_account()
 
 provider = IBMQ.get_provider(group='open', project='main')
-backend = provider.get_backend('ibmq_vigo')
-print(backend.status().pending_jobs)
+
+now = str(datetime.now())
+yearmonth=now[0:7]
+day=now[8:10]
+hour=now[11:13]
+
+for backend in provider.backends():
+    name=backend.name()
+    url = f"https://ibmq-statistics-default-rtdb.firebaseio.com/{name}/{yearmonth}/{day}/{hour}.json"
+    r=req.put(url,data=str(backend.status().pending_jobs))
+    print(r.text)
