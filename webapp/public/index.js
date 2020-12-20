@@ -1,6 +1,5 @@
-
 async function loadGraph(name,timeSpan) {
-    document.querySelector("#graph").innerHTML = ""
+    document.querySelector("#graph").innerHTML = "";
     const loadEl = document.querySelector('#load');
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 30, left: 60 },
@@ -18,26 +17,48 @@ async function loadGraph(name,timeSpan) {
     const data = [];
     var max = 0;
     var min = -1
-    if(timeSpan=="1D") {
-        const todayDate = new Date()
-        const month = `${todayDate.getFullYear()}-${todayDate.getMonth()+1}`
-        const day = todayDate.getDate()
-        console.log(month,day)
-        const today = dbobject[name][month][day]
-        for (hour of Object.keys(today)) {
-            const jobs = today[hour]
-            const d = {
-                date: `${month}-${day}-${hour}`,
-                value: `${jobs}`
+    function appendDataFromDB(days) {
+        const todayms = Date.now()
+        const dayms = 24*60*60*1000;//how many ms in 24 hours
+        for(let offset=0;offset<days;offset++) {
+            const currDate = new Date(todayms-offset*dayms)
+            const yearmonth = `${currDate.getFullYear()}-${currDate.getMonth()+1}`
+            const day = currDate.getDate()
+            const today = dbobject[name][yearmonth][day]||{}
+            for (hour of Object.keys(today)) {
+                const jobs = today[hour]
+                const d = {
+                    date: `${yearmonth}-${day}-${hour}`,
+                    value: `${jobs}`
+                }
+                if (jobs > max)
+                    max = jobs
+                if (min == -1 || jobs < min)
+                    min = jobs
+                data.push({ date: d3.timeParse("%Y-%m-%d-%H")(d.date), value: d.value })
             }
-            if (jobs > max)
-                max = jobs
-            if (min == -1 || jobs < min)
-                min = jobs
-            data.push({ date: d3.timeParse("%Y-%m-%d-%H")(d.date), value: d.value })
         }
     }
-
+    //["1D","5D","1M","6M","1Y","5Y","MAX"]
+    if(timeSpan=="1D") {
+        appendDataFromDB(1);
+    } else if(timeSpan=="5D") {
+        appendDataFromDB(5);
+        //convert to ms since unix epoch and subtract 24h then convert back to normal date, then parse month and year and day
+    } else if(timeSpan=="1M") {
+        appendDataFromDB(30);
+    } else if(timeSpan=="6M") {
+        appendDataFromDB(182);
+    } else if(timeSpan=="1Y") {
+        appendDataFromDB(365);
+    } else if(timeSpan=="MAX") {
+        //figure out how to implement this. MAX means use all available data for the computer
+        alert("sorry, max timescale not implemented yet. :(")
+        console.error("unimplemented case")
+    } else {
+        alert("sorry, unknwon timescale. :(")
+        console.error("unknwon timescale")
+    }
 
     data.sort((a, b) => {
         return Date.parse(a.date) - Date.parse(b.date)
@@ -60,7 +81,7 @@ async function loadGraph(name,timeSpan) {
     svg.append("path")
         .datum(data)
         .attr("fill", "none")
-        .attr("stroke", "#69b3a2")
+        .attr("stroke", "#a56FFF")
         .attr("stroke-width", 1.5)
         .attr("d", d3.line()
             .x(function (d) { return x(d.date) })
@@ -76,7 +97,7 @@ async function loadGraph(name,timeSpan) {
         .attr("cx", function (d) { return x(d.date) })
         .attr("cy", function (d) { return y(d.value) })
         .attr("r", 5)
-        .attr("fill", "#69b3a2")
+        .attr("fill", "#a56FFF")
 
     // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
     // // The Firebase SDK is initialized and available here!
