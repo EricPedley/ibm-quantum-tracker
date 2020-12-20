@@ -15,8 +15,14 @@ async function loadGraph(name,timeSpan) {
     const loadEl = document.querySelector('#load');
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 30, left: 60 },
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+        width = Math.max(
+            document.documentElement["clientWidth"],
+            document.body["scrollWidth"],
+            document.documentElement["scrollWidth"],
+            document.body["offsetWidth"],
+            document.documentElement["offsetWidth"]
+        )*0.9 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
     // append the svg object to the body of the page
     var svg = d3.select("#graph")
         .append("svg")
@@ -32,12 +38,14 @@ async function loadGraph(name,timeSpan) {
     function appendDataFromDB(days) {
         const todayms = Date.now()
         const dayms = 24*60*60*1000;//how many ms in 24 hours
-        for(let offset=0;offset<days;offset++) {
+        for(let offset=0;offset<days;offset++) {//for each day
             const currDate = new Date(todayms-offset*dayms)
             const yearmonth = `${currDate.getFullYear()}-${currDate.getMonth()+1}`
             const day = currDate.getDate()
+            if(!dbobject[name][yearmonth])
+                continue;
             const today = dbobject[name][yearmonth][day]||{}
-            for (hour of Object.keys(today)) {
+            for (hour of Object.keys(today)) {//for each hour
                 const jobs = today[hour]
                 const d = {
                     date: `${yearmonth}-${day}-${hour}`,
@@ -110,6 +118,11 @@ async function loadGraph(name,timeSpan) {
         .attr("cy", function (d) { return y(d.value) })
         .attr("r", 5)
         .attr("fill", "#a56FFF")
+        .append("svg:title")
+        .text((d)=>{
+            let dobj=new Date(d.date)
+            return `${d.value} jobs at ${(dobj.getHours()<10)?`0${dobj.getHours()}`:dobj.getHours()}:00 on ${dobj.toString().slice(0,3)} ${dobj.getMonth()+1}/${dobj.getDate()}/${dobj.getFullYear()}`
+        });
 
     // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
     // // The Firebase SDK is initialized and available here!

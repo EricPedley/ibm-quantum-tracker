@@ -5,3 +5,13 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.myContainer {
+  text-align:left; 
+  margin:auto; 
+  width:30em
+}
+
+#graph {
+  text-align:center
+}
