@@ -10,6 +10,8 @@ function changeTimeSpan(newTimeSpan) {
         loadGraph(compName,timeSpan);
 }
 
+window.onresize = ()=>compName&&timeSpan&&loadGraph(compName,timeSpan)
+
 async function loadGraph(name,timeSpan) {
     document.querySelector("#graph").innerHTML = "";
     const loadEl = document.querySelector('#load');
