@@ -1,3 +1,15 @@
+var compName,timeSpan
+function changeName(newName) {
+    compName=newName;
+    if(timeSpan)
+        loadGraph(compName,timeSpan);
+}
+function changeTimeSpan(newTimeSpan) {
+    timeSpan=newTimeSpan
+    if(compName)
+        loadGraph(compName,timeSpan);
+}
+
 async function loadGraph(name,timeSpan) {
     document.querySelector("#graph").innerHTML = "";
     const loadEl = document.querySelector('#load');
