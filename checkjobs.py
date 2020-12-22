@@ -14,7 +14,7 @@ for k,v in os.environ.items():#key and value
 
 if ibm_token=="":
     try:
-        ibm_token,firebase_secret = open("token.txt","r").read().split("\n")
+        ibm_token,firebase_secret = open("token.txt","r").read().split("\n")[0:2]
     except:
         raise RuntimeError("You didn't set the token in the IBM_TOKEN environment variable or token.txt file")
     
