@@ -4,14 +4,17 @@ import requests as req
 from datetime import datetime
 
 ibm_token = ""
+firebase_secret = ""
 
-for k,v in os.environ.items():
+for k,v in os.environ.items():#key and value
     if k =="IBM_TOKEN":
         ibm_token=v
+    if k =="FIREBASE_SECRET":
+        firebase_secret=v
 
 if ibm_token=="":
     try:
-        ibm_token = open("token.txt","r").read()
+        ibm_token,firebase_secret = open("token.txt","r").read().split("\n")
     except:
         raise RuntimeError("You didn't set the token in the IBM_TOKEN environment variable or token.txt file")
     
@@ -29,6 +32,6 @@ hour=now[11:13]
 
 for backend in provider.backends():
     name=backend.name()
-    url = f"https://ibmq-statistics-default-rtdb.firebaseio.com/{name}/{yearmonth}/{day}/{hour}.json"
+    url = f'https://ibmq-statistics-default-rtdb.firebaseio.com/{name}/{yearmonth}/{day}/{hour}.json?auth={firebase_secret}'
     r=req.put(url,data=str(backend.status().pending_jobs))
     print(r.text)
