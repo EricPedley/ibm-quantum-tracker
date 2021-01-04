@@ -4,7 +4,7 @@ import requests as req
 from datetime import datetime
 
 ibm_token = ""
-firebase_secret = ""
+firebase_secret = ""#this is the legacy secret credential from the service account page of firebase settings
 
 for k,v in os.environ.items():#key and value
     if k =="IBM_TOKEN":

@@ -10,14 +10,14 @@ function changeTimeSpan(newTimeSpan) {
         loadGraph(compName,timeSpan);
 }
 
-window.onresize = ()=>compName&&timeSpan&&loadGraph(compName,timeSpan)
+window.onresize = ()=>compName&&timeSpan&&loadGraph(compName,timeSpan)//loads graph if there is there is a selected computer and time scale
 
 async function loadGraph(name,timeSpan) {
     document.querySelector("#graph").innerHTML = "";
     const loadEl = document.querySelector('#load');
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 30, left: 60 },
-        width = Math.max(
+        width = Math.max(//pasted from https://stackoverflow.com/a/5947840
             document.documentElement["clientWidth"],
             document.body["scrollWidth"],
             document.documentElement["scrollWidth"],
@@ -42,11 +42,15 @@ async function loadGraph(name,timeSpan) {
         const dayms = 24*60*60*1000;//how many ms in 24 hours
         for(let offset=0;offset<days;offset++) {//for each day
             const currDate = new Date(todayms-offset*dayms)
-            const yearmonth = `${currDate.getFullYear()}-${currDate.getMonth()+1}`
+            console.log(currDate)
+            const currMonth = currDate.getMonth()+1
+            const yearmonth = `${currDate.getFullYear()}-${currMonth<10?"0":""}${currMonth}`//the ternary is to add a zero before the month number if it's single digit
+            console.log(yearmonth)
             const day = currDate.getDate()
+            console.log(dbobject)
             if(!dbobject[name][yearmonth])
                 continue;
-            const today = dbobject[name][yearmonth][day]||{}
+            const today = dbobject[name][yearmonth][`${day<10?"0":""}${day}`]||{}//the ternary is to add a zero before the day number if it's single digit.
             for (hour of Object.keys(today)) {//for each hour
                 const jobs = today[hour]
                 const d = {
